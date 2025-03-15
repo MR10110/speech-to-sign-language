@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech-to-Sign Language</title>
+    <style>
+        body {
+            background-color: #f0f8ff;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 { color: #1E90FF; }
+        button {
+            background-color: #1E90FF;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover { background-color: #4682B4; }
+        #output { font-size: 24px; font-weight: bold; margin-top: 20px; }
+        #signImage {
+            width: 300px;
+            height: 300px;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Speech-to-Sign Language Translator</h1>
+    <button onclick="startListening()">Start Listening</button>
+    <p id="output">Detected Speech: <span id="speechText">None</span></p>
+    <p>Sign Language:</p>
+    <img id="signImage" src="default.jpg" alt="Sign Language Image" />
+
+    <script>
+        // Web Speech API: Speech Recognition Setup
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'en-US';  // Set language
+        recognition.continuous = true; // Keep listening continuously
+        recognition.interimResults = false; // Ensure we get final results
+
+        // Speech recognition event
+        recognition.onresult = function(event) {
+            const speech = event.results[event.results.length - 1][0].transcript.toLowerCase().trim();
+            document.getElementById("speechText").innerText = speech;
+            showSignLanguage(speech);
+        };
+
+        // Restart recognition if it stops
+        recognition.onend = function() {
+            recognition.start();
+        };
+
+        // Start listening to speech
+        function startListening() {
+            recognition.start();
+        }
+
+        // Function to map recognized speech to sign language JPG images
+        function showSignLanguage(text) {
+            const signs = {
+                "hello": "asl_images/hello.png",
+                "thank you": "asl_images/thank_you.png",
+                "yes": "asl_images/yes.png",
+                "no": "asl_images/no.png",
+                "goodbye": "asl_images/goodbye.png",
+                "you are welcome": "asl_images/you_are_welcome.png"
+            };
+
+            // If speech matches a key, update image, otherwise default
+            document.getElementById("signImage").src = signs[text] || "default.jpg";
+        }
+    </script>
+</body>
+</html>
